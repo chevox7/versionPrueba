@@ -268,7 +268,7 @@ order by s.Fecha, s.Factura,S.nrc,s.nit
 						 from account_move_line_account_tax_rel ailt
 				             inner join account_tax atx on ailt.account_tax_id=atx.id
 				             inner join account_tax_group atg on atx.tax_group_id=atg.id
-			             where ailt.account_move_line_id=ail.id and lower(atg.code) IN ('exento'))            
+			             where ailt.account_move_line_id=ail.id and lower(atg.code) IN ('iva','nosujeto'))            
       )*(case when ai.move_type='out_refund' then -1 else 1 end) as Exento
       ,/*Calculando el gravado (todo lo que tiene un impuesto aplicado de iva)*/
      (select coalesce(sum(ail.price_subtotal),0.00) 
@@ -389,7 +389,7 @@ order by s.fecha, s.factura
 						 from account_move_line_account_tax_rel ailt
 				             inner join account_tax atx on ailt.account_tax_id=atx.id
 				             inner join account_tax_group atg on atx.tax_group_id=atg.id
-			             where ailt.account_move_line_id=ail.id and lower(atg.code) IN ('exento'))            
+			             where ailt.account_move_line_id=ail.id and lower(atg.code) IN ('iva','nosujeto'))            
       )*(case when ai.move_type='out_refund' then -1 else 1 end) as Exento
       ,/*Calculando el gravado (todo lo que tiene un impuesto aplicado de iva)*/
      (select coalesce(sum(ail.price_subtotal),0.00) 
@@ -478,10 +478,10 @@ order by s.fecha, s.factura
         return data
 
 
-    def get_consumer_details(self, company_id, date_year, date_month, doc_numero, stock_id):
+    def get_consumer_details(self, company_id, date_year, date_month, sv_invoice_serie_size, stock_id):
         data = {}
-        if doc_numero == None or doc_numero < 8:
-            doc_numero = 8
+        if sv_invoice_serie_size == None or sv_invoice_serie_size < 8:
+            sv_invoice_serie_size = 8
         sql = """CREATE OR REPLACE VIEW odoosv_reportesv_consumer_report AS (
             Select
 	SS.Fecha
@@ -542,9 +542,9 @@ select ai.invoice_date as fecha
 						 from account_move_line_account_tax_rel ailt
 				             inner join account_tax atx on ailt.account_tax_id=atx.id
 				             inner join account_tax_group atg on atx.tax_group_id=atg.id
-			             where ailt.account_move_line_id=ail.id and lower(atg.code)='exento')            
-      ) as Extento,
-	  /*Calculando el iva*/
+			             where ailt.account_move_line_id=ail.id and lower(atg.code)='iva')            
+      ) as Exento
+      ,/*Calculando el iva*/
       (Select coalesce(sum(ait.credit-ait.debit),0.00)
        from account_move_line ait 
  	       inner join account_tax atx on ait.tax_line_id=atx.id
@@ -597,7 +597,7 @@ where ai.company_id=   {0}
 )SS
 group by SS.fecha, SS.Grupo,SS.estado
 order by SS.fecha, SS.Grupo
-            )""".format(company_id,date_year,date_month,doc_numero)
+            )""".format(company_id,date_year,date_month,sv_invoice_serie_size)
         tools.drop_view_if_exists(self._cr, 'odoosv_reportesv_consumer_report')
         self._cr.execute(sql) #Query for view"
         if stock_id:
@@ -686,7 +686,7 @@ order by SS.fecha, SS.Grupo
     def get_stock_name(self, stock_location_id):
         sucursal= " "
         if self and stock_location_id:
-            sucursal = self.env['stock.warehouse'].search([('lot_stock_id','=',stock_location_id)],limit=2).name
+            sucursal = self.env['stock.warehouse'].search([('lot_stock_id','=',stock_location_id)],limit=1).name
             return sucursal
         else:
             return sucursal
