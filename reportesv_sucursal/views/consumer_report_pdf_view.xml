@@ -131,7 +131,7 @@
                   <h2 class="center-middle-title">LIBRO DE VENTAS A CONSUMIDORES Y EXPORTACIONES</h2>
                   <h2 class="center-middle-title">NIT: <span t-field="o.partner_id.nit"/> NRC: <span t-field="o.partner_id.nrc"/></h2>
                   <h2 class="center-middle-title">MES: <span t-esc="o.get_month_str(month)"/> DE <span t-esc="year"/></h2>
-                  <h2 class="center-middle-title">VALORES EXPRESADOS EN DOLARES DE LOS ESTADOS UNIDOS</h2>
+                  <h2 class="center-middle-title">VALORES EXPRESADOS EN DOLARES</h2>
                 </div>
               </t>
               <div>
