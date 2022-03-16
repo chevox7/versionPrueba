@@ -543,8 +543,8 @@ select ai.invoice_date as fecha
 				             inner join account_tax atx on ailt.account_tax_id=atx.id
 				             inner join account_tax_group atg on atx.tax_group_id=atg.id
 			             where ailt.account_move_line_id=ail.id and lower(atg.code)='exento')            
-      ) as Gravado
-      ,/*Calculando el iva*/
+      ) as Gravado,
+	  /*Calculando el iva*/
       (Select coalesce(sum(ait.credit-ait.debit),0.00)
        from account_move_line ait 
  	       inner join account_tax atx on ait.tax_line_id=atx.id
