@@ -531,7 +531,7 @@ select ai.invoice_date as fecha
 					from account_move_line_account_tax_rel ailt
 				        inner join account_tax atx on ailt.account_tax_id=atx.id
 				        inner join account_tax_group atg on atx.tax_group_id=atg.id
-			         where ailt.account_move_line_id=ail.id and lower(atg.code)='iva','nosujeto')   /* iva */
+			         where ailt.account_move_line_id=ail.id and lower(atg.code)='exento')   /* iva */
       ) as Gravado,
       /*Calculando el excento que no tiene iva*/
      (Select coalesce(sum(ail.price_subtotal),0.00)
