@@ -378,7 +378,7 @@ order by s.fecha, s.factura
 					from account_move_line_account_tax_rel ailt
 				        inner join account_tax atx on ailt.account_tax_id=atx.id
 				        inner join account_tax_group atg on atx.tax_group_id=atg.id
-			         where ailt.account_move_line_id=ail.id and lower(atg.code)='exento')
+			         where ailt.account_move_line_id=ail.id and lower(atg.code)='iva')
       )*(case when ai.move_type='out_refund' then -1 else 1 end) as Gravado,
       /*Calculando el excento que no tiene iva*/
      (Select coalesce(sum(ail.price_subtotal),0.00)
@@ -389,7 +389,7 @@ order by s.fecha, s.factura
 						 from account_move_line_account_tax_rel ailt
 				             inner join account_tax atx on ailt.account_tax_id=atx.id
 				             inner join account_tax_group atg on atx.tax_group_id=atg.id
-			             where ailt.account_move_line_id=ail.id and lower(atg.code) IN ('iva'))            
+			             where ailt.account_move_line_id=ail.id and lower(atg.code) IN ('exento'))            
       )*(case when ai.move_type='out_refund' then -1 else 1 end) as Exento
       ,/*Calculando el gravado (todo lo que tiene un impuesto aplicado de iva)*/
      (select coalesce(sum(ail.price_subtotal),0.00) 
@@ -532,7 +532,7 @@ select ai.invoice_date as fecha
 				        inner join account_tax atx on ailt.account_tax_id=atx.id
 				        inner join account_tax_group atg on atx.tax_group_id=atg.id
 			         where ailt.account_move_line_id=ail.id and lower(atg.code)='iva')
-      ) as Gravado,
+      ) as Exento,
       /*Calculando el excento que no tiene iva*/
      (Select coalesce(sum(ail.price_subtotal),0.00)
       from account_move_line ail
@@ -543,7 +543,7 @@ select ai.invoice_date as fecha
 				             inner join account_tax atx on ailt.account_tax_id=atx.id
 				             inner join account_tax_group atg on atx.tax_group_id=atg.id
 			             where ailt.account_move_line_id=ail.id and lower(atg.code)='exento')            
-      ) as Exento
+      ) as Gravado
       ,/*Calculando el iva*/
       (Select coalesce(sum(ait.credit-ait.debit),0.00)
        from account_move_line ait 
