@@ -357,7 +357,7 @@ order by s.fecha, s.factura
         return data
 
 
-    def get_consumerfull_details(self, company_id, date_year, date_month, stock_id):
+    def get_consumer_details(self, company_id, date_year, date_month, stock_id):
         data = {}
         sql = """CREATE OR REPLACE VIEW odoosv_reportesv_taxpayer_report AS (
             select * from(
@@ -478,7 +478,7 @@ order by s.fecha, s.factura
         return data
 
 
-    def get_consumer_details(self, company_id, date_year, date_month, sv_invoice_serie_size, stock_id):
+    def get_consumerfull_details(self, company_id, date_year, date_month, sv_invoice_serie_size, stock_id):
         data = {}
         if sv_invoice_serie_size == None or sv_invoice_serie_size < 8:
             sv_invoice_serie_size = 8
@@ -542,7 +542,7 @@ select ai.invoice_date as fecha
 						 from account_move_line_account_tax_rel ailt
 				             inner join account_tax atx on ailt.account_tax_id=atx.id
 				             inner join account_tax_group atg on atx.tax_group_id=atg.id
-			             where ailt.account_move_line_id=ail.id and lower(atg.code)='exento')            
+			             where ailt.account_move_line_id=ail.id and lower(atg.code)='iva')            
       ) as Exento
       ,/*Calculando el iva*/
       (Select coalesce(sum(ait.credit-ait.debit),0.00)
