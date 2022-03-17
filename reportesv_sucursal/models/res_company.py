@@ -357,8 +357,10 @@ order by s.fecha, s.factura
         return data
 
 
-    def get_consumer_details(self, company_id, date_year, date_month, stock_id):
+    def get_consumer_details(self, company_id, date_year, date_month, sv_invoice_serie_size, stock_id):
         data = {}
+		if sv_invoice_serie_size == None or sv_invoice_serie_size < 8:
+            sv_invoice_serie_size = 8
         sql = """CREATE OR REPLACE VIEW odoosv_reportesv_consumer_report AS (
             select * from(
     select COALESCE(ai.date,ai.invoice_date) as fecha
@@ -482,7 +484,7 @@ order by s.fecha, s.factura
         data = {}
         if sv_invoice_serie_size == None or sv_invoice_serie_size < 8:
             sv_invoice_serie_size = 8
-        sql = """CREATE OR REPLACE VIEW odoosv_reportesv_consumer_report AS (
+        sql = """CREATE OR REPLACE VIEW odoosv_reportesv_fullconsumer_report AS (
             Select
 	SS.Fecha
     ,0 as sucursal
@@ -601,10 +603,10 @@ order by SS.fecha, SS.Grupo
         tools.drop_view_if_exists(self._cr, 'odoosv_reportesv_consumer_report')
         self._cr.execute(sql) #Query for view"
         if stock_id:
-            data = "SELECT * FROM public.odoosv_reportesv_consumer_report where sucursal = {0}".format(stock_id) #Query que extrae la data de la sucursal solicitada
+            data = "SELECT * FROM public.odoosv_reportesv_fullconsumer_report where sucursal = {0}".format(stock_id) #Query que extrae la data de la sucursal solicitada
             self._cr.execute(data)
         else:
-            self._cr.execute("SELECT * FROM public.odoosv_reportesv_consumer_report")
+            self._cr.execute("SELECT * FROM public.odoosv_reportesv_fullconsumer_report")
         if self._cr.description: #Verify whether or not the query generated any tuple before fetching in order to avoid PogrammingError: No results when fetching
             data = self._cr.dictfetchall()
         return data
