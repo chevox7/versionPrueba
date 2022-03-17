@@ -357,11 +357,9 @@ order by s.fecha, s.factura
         return data
 
 
-    def get_consumer_details(self, company_id, date_year, date_month, sv_invoice_serie_size, stock_id):
+    def get_consumerfull_details(self, company_id, date_year, date_month, stock_id):
         data = {}
-		if sv_invoice_serie_size == None or sv_invoice_serie_size < 8:
-            sv_invoice_serie_size = 8
-        sql = """CREATE OR REPLACE VIEW odoosv_reportesv_consumer_report AS (
+        sql = """CREATE OR REPLACE VIEW odoosv_reportesv_consumerfull_report AS (
             select * from(
     select COALESCE(ai.date,ai.invoice_date) as fecha
     ,1 as sucursal
@@ -467,63 +465,33 @@ where ai.company_id=  {0}
 	and ((ai.nofiscal is not null and ai.nofiscal = False)or (ai.nofiscal is null))
 )S
 order by s.fecha, s.factura
-            )""".format(company_id,date_year,date_month,sv_invoice_serie_size)
-        tools.drop_view_if_exists(self._cr, 'odoosv_reportesv_consumer_report')
+            )""".format(company_id,date_year,date_month)
+        tools.drop_view_if_exists(self._cr, 'odoosv_reportesv_fullconsumer_report')
         self._cr.execute(sql)
         if stock_id:
-            data = "SELECT * FROM public.odoosv_reportesv_consumer_report where sucursal = {0}".format(stock_id)
+            data = "SELECT * FROM public.odoosv_reportesv_fullconsumer_report where sucursal = {0}".format(stock_id)
             self._cr.execute(data)
         else:
-            self._cr.execute("SELECT * FROM public.odoosv_reportesv_consumer_report")
+            self._cr.execute("SELECT * FROM public.odoosv_reportesv_fullconsumer_report")
         if self._cr.description: #Verify whether or not the query generated any tuple before fetching in order to avoid PogrammingError: No results when fetching
             data = self._cr.dictfetchall()
         return data
 
 
-    def get_consumerfull_details(self, company_id, date_year, date_month, sv_invoice_serie_size, stock_id):
+    def get_consumer_details(self, company_id, date_year, date_month, sv_invoice_serie_size, stock_id):
         data = {}
         if sv_invoice_serie_size == None or sv_invoice_serie_size < 8:
             sv_invoice_serie_size = 8
-        sql = """CREATE OR REPLACE VIEW odoosv_reportesv_fullconsumer_report AS (
-            Select
-	SS.Fecha
-    ,0 as sucursal
-	,SS.grupo
-	,min(SS.Factura) as DELNum
-	,max(SS.Factura) as ALNum
-	,sum(SS.exento) as Exento
-	,sum(SS.GravadoLocal) as GravadoLocal
-	,sum(SS.GravadoExportacion) as GravadoExportacion
-	,Sum(SS.ivaLocal) as IvaLocal
-	,Sum(SS.ivaexportacion) as IvaExportacion
-	,Sum(SS.retenido) as Retenido
-	,0.0 as nosujeto
-	,estado
-FROM (
-select S.fecha
-	,S.factura
-	,S.estado
-	,S.grupo
-	,S.exento
-	,case 
-		when S.tipo_localidad='Local' then S.Gravado 
-		else 0.00 end as GravadoLocal
-	,case 
-		when S.tipo_localidad!='Local' then S.Gravado 
-		else 0.00 end as GravadoExportacion
-	,case 
-		when S.tipo_localidad='Local' then S.Iva 
-		else 0.00 end as IvaLocal
-	,case 
-		when S.tipo_localidad!='Local' then S.Iva 
-		else 0.00 end as IvaExportacion
-	,S.Retenido
-from(
-select ai.invoice_date as fecha
-	,coalesce(ai.doc_numero,cast(ai.id as varchar)) as factura		
-	,'Valida' as estado
-	,FG.grupo	
-	,case when doc.codigo='Exportacion' then 'nolocal' else 'Local' end as tipo_localidad
+        sql = """CREATE OR REPLACE VIEW odoosv_reportesv_consumer_report AS (
+           select * from(
+    select COALESCE(ai.date,ai.invoice_date) as fecha
+    ,1 as sucursal
+    ,ai.id as factura_id
+	,ai.doc_numero as factura
+	,rp.name as cliente
+	,rp.nrc as NRC	
+	,rp.nit as NIT	
+	,ai.state as estado
 	,/*Calculando el gravado (todo lo que tiene un impuesto aplicado de iva)*/
      (select coalesce(sum(ail.price_subtotal),0.00) 
       from account_move_line ail
@@ -533,8 +501,8 @@ select ai.invoice_date as fecha
 					from account_move_line_account_tax_rel ailt
 				        inner join account_tax atx on ailt.account_tax_id=atx.id
 				        inner join account_tax_group atg on atx.tax_group_id=atg.id
-			         where ailt.account_move_line_id=ail.id and lower(atg.code)='iva')   /* iva */
-      ) as Gravado,
+			         where ailt.account_move_line_id=ail.id and lower(atg.code)='iva')
+      )*(case when ai.move_type='out_refund' then -1 else 1 end) as Gravado,
       /*Calculando el excento que no tiene iva*/
      (Select coalesce(sum(ail.price_subtotal),0.00)
       from account_move_line ail
@@ -544,8 +512,19 @@ select ai.invoice_date as fecha
 						 from account_move_line_account_tax_rel ailt
 				             inner join account_tax atx on ailt.account_tax_id=atx.id
 				             inner join account_tax_group atg on atx.tax_group_id=atg.id
-			             where ailt.account_move_line_id=ail.id and lower(atg.code)='iva')            
-      ) as Exento
+			             where ailt.account_move_line_id=ail.id and lower(atg.code) IN ('iva','nosujeto'))            
+      )*(case when ai.move_type='out_refund' then -1 else 1 end) as Exento
+      ,/*Calculando el gravado (todo lo que tiene un impuesto aplicado de iva)*/
+     (select coalesce(sum(ail.price_subtotal),0.00) 
+      from account_move_line ail
+      where ail.move_id=ai.id
+      	  and ail.exclude_from_invoice_tab=False 
+	      and exists(select ailt.account_tax_id 
+					from account_move_line_account_tax_rel ailt
+				        inner join account_tax atx on ailt.account_tax_id=atx.id
+				        inner join account_tax_group atg on atx.tax_group_id=atg.id
+			         where ailt.account_move_line_id=ail.id and lower(atg.code)='nosujeto')
+      )*(case when ai.move_type='out_refund' then -1 else 1 end) as NoSujeto
       ,/*Calculando el iva*/
       (Select coalesce(sum(ait.credit-ait.debit),0.00)
        from account_move_line ait 
@@ -562,51 +541,61 @@ select ai.invoice_date as fecha
        where ait.move_id=ai.id
 	       and lower(atg.code)='retencion'
        ) as Retenido
+	    ,/*Calculando el percibido*/
+      (Select coalesce(sum(ait.credit-ait.debit),0.00)
+       from account_move_line ait 
+ 	       inner join account_tax atx on ait.tax_line_id=atx.id
+	       inner join account_tax_group atg on atx.tax_group_id=atg.id
+       where ait.move_id=ai.id
+	       and lower(atg.code)='percepcion'
+       ) as Percibido
+       
 from account_move ai
 	inner join res_partner rp on ai.partner_id=rp.id
-	inner join odoosv_fiscal_document doc on ai.tipo_documento_id =doc.id
-	inner join (select * from FacturasAgrupadas( {0}, {2} , {1} , 8 )) FG on ai.id=FG.invoice_id
-where ai.company_id=   {0} 
-	and date_part('year',COALESCE(ai.date,ai.invoice_date))=    {1}  
-	and date_part('month',COALESCE(ai.date,ai.invoice_date))=  {2}  
-	and ai.move_type='out_invoice' 
-	and doc.codigo in ('Factura','Exportacion')
+	inner join odoosv_fiscal_document doc on ai.tipo_documento_id=doc.id
+	where ai.company_id=  {0} 
+	and date_part('year',COALESCE(ai.date,ai.invoice_date))=  {1} 
+	and date_part('month',COALESCE(ai.date,ai.invoice_date))=  {2}
+	and ((ai.move_type='out_invoice') or (ai.move_type='out_refund'))
+	and doc.codigo='CCF' 
 	and ai.state in ('posted')
 	
 union 
 
 select COALESCE(ai.date,ai.invoice_date) as fecha
-	,coalesce(ai.doc_numero,cast(ai.id as varchar)) as factura		
-	,'Valida' as estado
-	,FG.grupo
-	,case when doc.codigo='Exportacion' then 'nolocal' else 'Local' end as sv_region
+    ,1 as sucursal
+    ,ai.id as factura_id
+	,ai.doc_numero as factura
+	,'Anulado' as cliente
+	,rp.nrc as NRC	
+	,rp.nit as nit	
+	,ai.state as estado
 	,0.0 as Gravado
 	,0.0 as Exento
+	,0.0 as NoSujeto
     ,0.0 as Iva
 	,0.0 as Retenido
+	,0.0 as Percibido        
 from account_move ai
 	inner join res_partner rp on ai.partner_id=rp.id
-	inner join odoosv_fiscal_document doc on ai.tipo_documento_id =doc.id
-	inner join (select * from FacturasAgrupadas( {0} , {2}, {1} , 8)) FG on ai.id=FG.invoice_id
-where ai.company_id=   {0} 
-	and date_part('year',COALESCE(ai.date,ai.invoice_date))=    {1} 
-	and date_part('month',COALESCE(ai.date,ai.invoice_date))=   {2} 
-	and ai.move_type='out_invoice' 
-	and doc.codigo in ('Factura','Exportacion')
+	inner join odoosv_fiscal_document doc on ai.tipo_documento_id=doc.id
+where ai.company_id=  {0} 
+	and date_part('year',COALESCE(ai.date,ai.invoice_date))=   {1} 
+	and date_part('month',COALESCE(ai.date,ai.invoice_date))=    {2} 
+	and ((ai.move_type='out_invoice') or (ai.move_type='out_refund'))
+	and doc.codigo='CCF' 
 	and ai.state in ('cancel')
-	and (ai.nofiscal is null or ai.nofiscal = False)
+	and ((ai.nofiscal is not null and ai.nofiscal = False)or (ai.nofiscal is null))
 )S
-)SS
-group by SS.fecha, SS.Grupo,SS.estado
-order by SS.fecha, SS.Grupo
+order by s.fecha, s.factura
             )""".format(company_id,date_year,date_month,sv_invoice_serie_size)
         tools.drop_view_if_exists(self._cr, 'odoosv_reportesv_consumer_report')
         self._cr.execute(sql) #Query for view"
         if stock_id:
-            data = "SELECT * FROM public.odoosv_reportesv_fullconsumer_report where sucursal = {0}".format(stock_id) #Query que extrae la data de la sucursal solicitada
+            data = "SELECT * FROM public.odoosv_reportesv_consumer_report where sucursal = {0}".format(stock_id) #Query que extrae la data de la sucursal solicitada
             self._cr.execute(data)
         else:
-            self._cr.execute("SELECT * FROM public.odoosv_reportesv_fullconsumer_report")
+            self._cr.execute("SELECT * FROM public.odoosv_reportesv_consumer_report")
         if self._cr.description: #Verify whether or not the query generated any tuple before fetching in order to avoid PogrammingError: No results when fetching
             data = self._cr.dictfetchall()
         return data
