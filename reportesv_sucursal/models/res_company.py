@@ -467,7 +467,7 @@ where ai.company_id=  {0}
 	and ((ai.nofiscal is not null and ai.nofiscal = False)or (ai.nofiscal is null))
 )S
 order by s.fecha, s.factura
-            )""".format(company_id,date_year,date_month)
+            )""".format(company_id,date_year,date_month,sv_invoice_serie_size)
         tools.drop_view_if_exists(self._cr, 'odoosv_reportesv_consumer_report')
         self._cr.execute(sql)
         if stock_id:
