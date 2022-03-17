@@ -357,7 +357,7 @@ order by s.fecha, s.factura
         return data
 
 
-    def get_consumer_details(self, company_id, date_year, date_month, stock_id):
+    def get_consumerfull_details(self, company_id, date_year, date_month, stock_id):
         data = {}
         sql = """CREATE OR REPLACE VIEW odoosv_reportesv_taxpayer_report AS (
             select * from(
@@ -478,7 +478,7 @@ order by s.fecha, s.factura
         return data
 
 
-    def get_consumerfull_details(self, company_id, date_year, date_month, sv_invoice_serie_size, stock_id):
+    def get_consumer_details(self, company_id, date_year, date_month, sv_invoice_serie_size, stock_id):
         data = {}
         if sv_invoice_serie_size == None or sv_invoice_serie_size < 8:
             sv_invoice_serie_size = 8
