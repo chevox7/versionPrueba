@@ -23,7 +23,7 @@
     </record>
 
     <record id="action_consumer_report_wizard" model="ir.actions.act_window">
-  		<field name="name">Libro de Ventas Consumidores</field>
+  		<field name="name">Libro de Ventas Consumidores2</field>
       <field name="type">ir.actions.act_window</field>
       <field name="res_model">wizard.sv.consumer.report</field>
   		<field name="view_mode">form</field>

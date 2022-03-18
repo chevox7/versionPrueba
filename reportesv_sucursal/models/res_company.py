@@ -478,10 +478,8 @@ order by s.fecha, s.factura
         return data
 
 
-    def get_consumer_details(self, company_id, date_year, date_month, sv_invoice_serie_size, stock_id):
+    def get_consumer_details(self, company_id, date_year, date_month, stock_id):
         data = {}
-        if sv_invoice_serie_size == None or sv_invoice_serie_size < 8:
-            sv_invoice_serie_size = 8
         sql = """CREATE OR REPLACE VIEW odoosv_reportesv_consumer_report AS (
            select * from(
     select COALESCE(ai.date,ai.invoice_date) as fecha
@@ -583,12 +581,12 @@ where ai.company_id=  {0}
 	and date_part('year',COALESCE(ai.date,ai.invoice_date))=   {1} 
 	and date_part('month',COALESCE(ai.date,ai.invoice_date))=    {2} 
 	and ((ai.move_type='out_invoice') or (ai.move_type='out_refund'))
-	and doc.codigo='CCF' 
+	and doc.codigo='Factura' 
 	and ai.state in ('cancel')
 	and ((ai.nofiscal is not null and ai.nofiscal = False)or (ai.nofiscal is null))
 )S
 order by s.fecha, s.factura
-            )""".format(company_id,date_year,date_month,sv_invoice_serie_size)
+            )""".format(company_id,date_year,date_month)
         tools.drop_view_if_exists(self._cr, 'odoosv_reportesv_consumer_report')
         self._cr.execute(sql) #Query for view"
         if stock_id:
