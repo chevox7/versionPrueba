@@ -9,7 +9,7 @@ class odoosv_purchase_report_pdf(models.AbstractModel):
     @api.model
     def _get_report_values(self, docids, data=None):
         report = self.env['ir.actions.report'].\
-            _get_report_from_name('reportesv_sucursal.odoosv_purchase_report_pdf1')
+            _get_report_from_name('reportesv_sucursal.odoosv_purchase_report_pdf')
         if data and data.get('form')\
             and  data.get('form').get('company_id')\
             and  data.get('form').get('date_year')\
