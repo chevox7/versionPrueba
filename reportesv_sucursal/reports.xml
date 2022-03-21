@@ -89,7 +89,7 @@
                                                   ])]"/>
         </record>
 
-        <record id="paperformat_book_consumer_report_pdf" model="report.paperformat">
+        <record id="paperformat_book_consumer_report_pdf1" model="report.paperformat">
             <field name="name">Libros Consumirdor PDF</field>
             <field name="default" eval="True" />
             <field name="format">Letter</field>
