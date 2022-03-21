@@ -25,7 +25,7 @@
   <record id="action_taxpayer_report_wizard1" model="ir.actions.act_window">
 		<field name="name">Libro de Ventas Contribuyentes2</field>
     <field name="type">ir.actions.act_window</field>
-    <field name="res_model">wizard.sv.taxpayer.report</field>
+    <field name="res_model">wizard.sv.taxpayer.report1</field>
 		<field name="view_mode">form</field>
     <field name="target">new</field>
 	</record>
