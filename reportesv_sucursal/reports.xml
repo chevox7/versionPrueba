@@ -27,8 +27,8 @@
             string="Libro de ventas consumidores"
             model="res.company"
             report_type="qweb-pdf"
-            file="reportesv_sucursal.odoosv_consumer_report_pdf"
-            name="reportesv_sucursal.odoosv_consumer_report_pdf"
+            file="reportesv_sucursal.odoosv_consumer_report_pdf1"
+            name="reportesv_sucursal.odoosv_consumer_report_pdf1"
             menu="False"
         />
 
@@ -101,7 +101,7 @@
             <field name="header_line" eval="False" />
             <field name="header_spacing">0</field>
             <field name="dpi">90</field>
-            <field name="report_ids" eval="[(6,0,[ref('reportesv_sucursal.report_consumer_sales_pdf'),
+            <field name="report_ids" eval="[(6,0,[ref('reportesv_sucursal.report_consumer_sales_pdf1'),
                                                   ref('reportesv_sucursal.report_ticket_sales_pdf'),])]"/>
         </record>
 

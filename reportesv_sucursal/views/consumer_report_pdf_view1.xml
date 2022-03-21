@@ -1,6 +1,6 @@
 <odoo>
   <data>
-    <template id ='odoosv_consumer_report_pdf'>
+    <template id ='odoosv_consumer_report_pdf1'>
       <t t-call="web.html_container">
         <t t-call="web.basic_layout">
           <div class="page">
@@ -128,7 +128,7 @@
                 <div style="text-align:center;">
                   <h2 class="center-middle-title" style="font-size:20px;">NOMBRE DEL CONTRIBUYENTE: <span t-field="o.name"/></h2>
                   <h2 class="center-middle-title">SUCURSAL: <span t-esc="o.get_stock_name(stock_id)"/></h2>
-                  <h2 class="center-middle-title">LIBRO DE VENTAS A CONSUMIDORES Y EXPORTACIONES</h2>
+                  <h2 class="center-middle-title">LIBRO anexos DE VENTAS A CONSUMIDORES </h2>
                   <h2 class="center-middle-title">NIT: <span t-field="o.partner_id.nit"/> NRC: <span t-field="o.partner_id.nrc"/></h2>
                   <h2 class="center-middle-title">MES: <span t-esc="o.get_month_str(month)"/> DE <span t-esc="year"/></h2>
                   <h2 class="center-middle-title">VALORES EXPRESADOS EN DOLARES</h2>

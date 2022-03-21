@@ -720,6 +720,127 @@ order by s.fecha, s.factura
             data = self._cr.dictfetchall()
         return data
 
+    def get_consumer_details1(self, company_id, date_year, date_month, stock_id):
+        data = {}
+        sql = """CREATE OR REPLACE VIEW odoosv_reportesv_consumer_report1 AS (
+           select * from(
+    select COALESCE(ai.date,ai.invoice_date) as fecha
+    ,1 as sucursal
+    ,ai.id as factura_id
+	,ai.doc_numero as factura
+	,rp.name as cliente
+	,rp.nrc as NRC	
+	,rp.nit as NIT	
+	,ai.state as estado
+	,/*Calculando el gravado (todo lo que tiene un impuesto aplicado de iva)*/
+     (select coalesce(sum(ail.price_subtotal),0.00) 
+      from account_move_line ail
+      where ail.move_id=ai.id
+      	  and ail.exclude_from_invoice_tab=False 
+	      and exists(select ailt.account_tax_id 
+					from account_move_line_account_tax_rel ailt
+				        inner join account_tax atx on ailt.account_tax_id=atx.id
+				        inner join account_tax_group atg on atx.tax_group_id=atg.id
+			         where ailt.account_move_line_id=ail.id and lower(atg.code)='iva')
+      )*(case when ai.move_type='out_refund' then -1 else 1 end) as Gravado,
+      /*Calculando el excento que no tiene iva*/
+     (Select coalesce(sum(ail.price_subtotal),0.00)
+      from account_move_line ail
+      where ail.move_id=ai.id
+      	  and ail.exclude_from_invoice_tab=False 
+	      and not exists(select ailt.account_tax_id 
+						 from account_move_line_account_tax_rel ailt
+				             inner join account_tax atx on ailt.account_tax_id=atx.id
+				             inner join account_tax_group atg on atx.tax_group_id=atg.id
+			             where ailt.account_move_line_id=ail.id and lower(atg.code) IN ('iva','nosujeto'))            
+      )*(case when ai.move_type='out_refund' then -1 else 1 end) as Exento
+      ,/*Calculando el gravado (todo lo que tiene un impuesto aplicado de iva)*/
+     (select coalesce(sum(ail.price_subtotal),0.00) 
+      from account_move_line ail
+      where ail.move_id=ai.id
+      	  and ail.exclude_from_invoice_tab=False 
+	      and exists(select ailt.account_tax_id 
+					from account_move_line_account_tax_rel ailt
+				        inner join account_tax atx on ailt.account_tax_id=atx.id
+				        inner join account_tax_group atg on atx.tax_group_id=atg.id
+			         where ailt.account_move_line_id=ail.id and lower(atg.code)='nosujeto')
+      )*(case when ai.move_type='out_refund' then -1 else 1 end) as NoSujeto
+      ,/*Calculando el iva*/
+      (Select coalesce(sum(ait.credit-ait.debit),0.00)
+       from account_move_line ait 
+ 	       inner join account_tax atx on ait.tax_line_id=atx.id
+	       inner join account_tax_group atg on atx.tax_group_id=atg.id
+       where ait.move_id=ai.id
+	       and lower(atg.code)='iva'
+       ) as Iva
+	   ,/*Calculando el retenido*/
+      (Select coalesce(sum(ait.debit-ait.credit),0.00)
+       from account_move_line ait 
+ 	       inner join account_tax atx on ait.tax_line_id=atx.id
+	       inner join account_tax_group atg on atx.tax_group_id=atg.id
+       where ait.move_id=ai.id
+	       and lower(atg.code)='retencion'
+       ) as Retenido
+	    ,/*Calculando el percibido*/
+      (Select coalesce(sum(ait.credit-ait.debit),0.00)
+       from account_move_line ait 
+ 	       inner join account_tax atx on ait.tax_line_id=atx.id
+	       inner join account_tax_group atg on atx.tax_group_id=atg.id
+       where ait.move_id=ai.id
+	       and lower(atg.code)='percepcion'
+       ) as Percibido
+       
+from account_move ai
+	inner join res_partner rp on ai.partner_id=rp.id
+	inner join odoosv_fiscal_document doc on ai.tipo_documento_id=doc.id
+	where ai.company_id=  {0} 
+	and date_part('year',COALESCE(ai.date,ai.invoice_date))=  {1} 
+	and date_part('month',COALESCE(ai.date,ai.invoice_date))=  {2}
+	and ((ai.move_type='out_invoice') or (ai.move_type='out_refund'))
+	and doc.codigo='CCF' 
+	and ai.state in ('posted')
+	
+union 
+
+select COALESCE(ai.date,ai.invoice_date) as fecha
+    ,1 as sucursal
+    ,ai.id as factura_id
+	,ai.doc_numero as factura
+	,'Anulado' as cliente
+	,rp.nrc as NRC	
+	,rp.nit as nit	
+	,ai.state as estado
+	,0.0 as Gravado
+	,0.0 as Exento
+	,0.0 as NoSujeto
+    ,0.0 as Iva
+	,0.0 as Retenido
+	,0.0 as Percibido        
+from account_move ai
+	inner join res_partner rp on ai.partner_id=rp.id
+	inner join odoosv_fiscal_document doc on ai.tipo_documento_id=doc.id
+where ai.company_id=  {0} 
+	and date_part('year',COALESCE(ai.date,ai.invoice_date))=   {1} 
+	and date_part('month',COALESCE(ai.date,ai.invoice_date))=    {2} 
+	and ((ai.move_type='out_invoice') or (ai.move_type='out_refund'))
+	and doc.codigo='Factura' 
+	and ai.state in ('cancel')
+	and ((ai.nofiscal is not null and ai.nofiscal = False)or (ai.nofiscal is null))
+)S
+order by s.fecha, s.factura
+            )""".format(company_id,date_year,date_month)
+        tools.drop_view_if_exists(self._cr, 'odoosv_reportesv_consumer_report1')
+        self._cr.execute(sql) #Query for view"
+        if stock_id:
+            data = "SELECT * FROM public.odoosv_reportesv_consumer_report1 where sucursal = {0}".format(stock_id) #Query que extrae la data de la sucursal solicitada
+            self._cr.execute(data)
+        else:
+            self._cr.execute("SELECT * FROM public.odoosv_reportesv_consumer_report1")
+        if self._cr.description: #Verify whether or not the query generated any tuple before fetching in order to avoid PogrammingError: No results when fetching
+            data = self._cr.dictfetchall()
+        return data
+
+
     def get_ticket_details(self, company_id, date_year, date_month, stock_id):
         data = {}
         sql = """CREATE OR REPLACE VIEW odoosv_reportesv_ticket_report AS (Select
