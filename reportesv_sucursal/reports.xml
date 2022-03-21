@@ -13,12 +13,12 @@
         />
 
         <report
-            id="report_taxpayer_sales_pdf"
+            id="report_taxpayer_sales_pdf1"
             string="Libro de ventas contribuyentes"
             model="res.company"
             report_type="qweb-pdf"
-            file="reportesv_sucursal.odoosv_taxpayer_report_pdf"
-            name="reportesv_sucursal.odoosv_taxpayer_report_pdf"
+            file="reportesv_sucursal.odoosv_taxpayer_report_pdf1"
+            name="reportesv_sucursal.odoosv_taxpayer_report_pdf1"
             menu="False"
         />
 
@@ -85,7 +85,7 @@
             <field name="header_spacing">0</field>
             <field name="dpi">90</field>
             <field name="report_ids" eval="[(6,0,[ref('reportesv_sucursal.report_purchase_pdf'),
-                                                  ref('reportesv_sucursal.report_taxpayer_sales_pdf'),
+                                                  ref('reportesv_sucursal.report_taxpayer_sales_pdf1'),
                                                   ])]"/>
         </record>
 

@@ -5,7 +5,7 @@ from pytz import timezone
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo import SUPERUSER_ID
 
-class wizard_sv_taxpayer_report(models.TransientModel):
+class wizard_sv_taxpayer_report1(models.TransientModel):
     _name = 'wizard.sv.taxpayer.report'
 
     company_id=fields.Many2one('res.company', string="Company", help='Company',default=lambda self: self.env.user.company_id.id)
@@ -17,4 +17,4 @@ class wizard_sv_taxpayer_report(models.TransientModel):
         datas = {'ids': self._ids,
                  'form': self.read()[0],
                  'model': 'wizard.sv.taxpayer.report'}
-        return self.env.ref('reportesv_sucursal.report_taxpayer_sales_pdf').report_action(self, data=datas)
+        return self.env.ref('reportesv_sucursal.report_taxpayer_sales_pdf1').report_action(self, data=datas)

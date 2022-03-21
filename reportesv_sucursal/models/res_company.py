@@ -466,13 +466,13 @@ order by s.fecha, s.factura
     )S
     order by s.fecha, s.factura
                 )""".format(company_id,date_year,date_month)
-            tools.drop_view_if_exists(self._cr, 'odoosv_reportesv_taxpayer_report')
+            tools.drop_view_if_exists(self._cr, 'odoosv_reportesv_taxpayer_report1')
             self._cr.execute(sql)
             if stock_id:
-                data = "SELECT * FROM public.odoosv_reportesv_taxpayer_report where sucursal = {0}".format(stock_id)
+                data = "SELECT * FROM public.odoosv_reportesv_taxpayer_report1 where sucursal = {0}".format(stock_id)
                 self._cr.execute(data)
             else:
-                self._cr.execute("SELECT * FROM public.odoosv_reportesv_taxpayer_report")
+                self._cr.execute("SELECT * FROM public.odoosv_reportesv_taxpayer_report1")
             if self._cr.description: #Verify whether or not the query generated any tuple before fetching in order to avoid PogrammingError: No results when fetching
                 data = self._cr.dictfetchall()
             return data

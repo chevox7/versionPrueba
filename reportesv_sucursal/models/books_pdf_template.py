@@ -21,14 +21,14 @@ class odoosv_purchase_report_pdf(models.AbstractModel):
                 'data': data,
                 }
 
-class odoosv_taxpayer_report_pdf(models.AbstractModel):
-    _name = 'report.reportesv_sucursal.odoosv_taxpayer_report_pdf'
+class odoosv_taxpayer_report_pdf1(models.AbstractModel):
+    _name = 'report.reportesv_sucursal.odoosv_taxpayer_report_pdf1'
     _auto = False
 
     @api.model
     def _get_report_values(self, docids, data=None):
         report = self.env['ir.actions.report'].\
-            _get_report_from_name('reportesv_sucursal.odoosv_taxpayer_report_pdf')
+            _get_report_from_name('reportesv_sucursal.odoosv_taxpayer_report_pdf1')
         if data and data.get('form')\
             and  data.get('form').get('company_id')\
             and  data.get('form').get('date_year')\

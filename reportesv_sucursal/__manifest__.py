@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Reporte-SV-Sucursal",
+    'name': "Reporte-SV-Sucursal1",
 
     'summary': """Allows users to print Purchase Report, Sales Report either taxpayer or consumer by invoices or tickets""",
 
@@ -23,7 +23,7 @@
         'reports.xml',
         'security/ir.model.access.csv',
         'views/purchase_report_pdf_view.xml',
-        'views/taxpayer_report_pdf_view.xml',
+        'views/taxpayer_report_pdf_view1.xml',
         'views/consumer_report_pdf_view.xml',
         #'views/ticket_report_pdf_view.xml',
         'wizard/wizard_purchases_report.xml',
