@@ -116,11 +116,11 @@
               </t>
             <!--Fin encabezado-->
             <!--Contenido de reporte-->
-            <!--t t-foreach="company.get_taxpayer_details(company_id, year, month)" t-as="c"-->
+            <!--t t-foreach="company.get_taxpayer_details1(company_id, year, month)" t-as="c"-->
               <table class="table table-bordered" style="border: 1px solid black; text-align: center; vertical-align: middle; height: auto; width: 100%; padding: 0px; border-spacing: 0px; border-collapse: collapse;">
                   <tr class="tr-color" style="width: 100%;">
                     <th rowspan="2" class="center-middle" style="width:5% !important;">#</th>
-                    <th rowspan="2" class="center-middle" style="width:20% !important">FECHA</th>
+                <!--    <th rowspan="2" class="center-middle" style="width:20% !important">FECHA</th> -->
                     <th rowspan="2" class="center-middle-o" style="width:30%; font-size: 10px">No. Corr. Por Tipo De Documento</th>
                     <th rowspan="2" class="center-middle-o" style="width:90% !important;">CLIENTE</th>
                     <th rowspan="2" class="center-middle-o">N.R.C.</th>
