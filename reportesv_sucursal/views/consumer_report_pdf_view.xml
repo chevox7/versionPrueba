@@ -168,7 +168,7 @@
                   <tr class="tr-color">
                     <th rowspan="2" class="center-middle-o" style="white-space: nowrap;">Del No.</th>
                     <th rowspan="2" class="center-middle-o" style="white-space: nowrap;">Al No.</th>
-                    <th rowspan="2" class="center-middle-o">Exentas</th>
+                <!--    <th rowspan="2" class="center-middle-o">Exentas</th>-->
                     <th colspan="2" class="center-middle">Gravadas</th>
                     <th rowspan="2" class="center-middle-o">Retención</th>
                   </tr>
