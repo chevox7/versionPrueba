@@ -17,4 +17,4 @@ class wizard_sv_consumer_report(models.TransientModel):
         datas = {'ids': self._ids,
                  'form': self.read()[0],
                  'model': 'wizard.sv.consumer.report'}
-        return self.env.ref('reportesv_sucursal.report_consumer_sales_pdf').report_action(self, data=datas)
+        return self.env.ref('reportesv_sucursal_copia.report_consumer_sales_pdf').report_action(self, data=datas)

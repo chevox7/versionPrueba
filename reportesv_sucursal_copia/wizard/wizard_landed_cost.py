@@ -16,4 +16,4 @@ class wizard_sv_stock_landed_cost_report(models.TransientModel):
         datas = {'ids': self._ids,
                  'form': self.read()[0],
                  'model': 'wizard.sv.stock.landed.cost.report'}
-        return self.env.ref('reportesv_sucursal.report_stock_landed_cost_pdf').report_action(self, data=datas)
+        return self.env.ref('reportesv_sucursal_copia.report_stock_landed_cost_pdf').report_action(self, data=datas)
