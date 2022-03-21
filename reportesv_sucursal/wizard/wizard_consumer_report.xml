@@ -23,13 +23,13 @@
     </record>
 
     <record id="action_consumer_report_wizard" model="ir.actions.act_window">
-  		<field name="name">Libro de Ventas Consumidores2</field>
+  		<field name="name">Libro de Ventas Consumidores</field>
       <field name="type">ir.actions.act_window</field>
       <field name="res_model">wizard.sv.consumer.report</field>
   		<field name="view_mode">form</field>
       <field name="target">new</field>
   	</record>
 
-        <menuitem id="consumer_report" name="Libro de IVA Consumidor" action="action_consumer_report_wizard" parent="account_reports.account_reports_audit_reports_menu" sequence="9"/>
+        <menuitem id="consumer_report" name="Anexo Libro de IVA Consumidor" action="action_consumer_report_wizard" parent="account_reports.account_reports_audit_reports_menu" sequence="9"/>
   </data>
 </odoo>
