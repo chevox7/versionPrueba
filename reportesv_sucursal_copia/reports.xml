@@ -72,7 +72,7 @@
             menu="False"
         /-->
 
-        <record id="paperformat_book_report_pdf0" model="report.paperformat">
+        <record id="paperformat_book_report_pdf" model="report.paperformat">
             <field name="name">Libros Legales PDF</field>
             <field name="default" eval="True" />
             <field name="format">Letter</field>
@@ -105,7 +105,7 @@
                                                   ref('reportesv_sucursal.report_ticket_sales_pdf'),])]"/>
         </record>
 
-        <record id="paperformat_book_report_pdf0_c" model="report.paperformat">
+        <record id="paperformat_book_report_pdf_c" model="report.paperformat">
             <field name="name">Reporte Retaceo</field>
             <field name="default" eval="True" />
             <field name="format">Legal</field>
