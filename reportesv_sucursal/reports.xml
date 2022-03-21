@@ -23,7 +23,7 @@
         />
 
         <report
-            id="report_consumer_sales_pdf"
+            id="report_consumer_sales_pdf1"
             string="Libro de ventas consumidores"
             model="res.company"
             report_type="qweb-pdf"
