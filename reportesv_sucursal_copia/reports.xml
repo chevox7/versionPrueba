@@ -84,7 +84,7 @@
             <field name="header_line" eval="False" />
             <field name="header_spacing">0</field>
             <field name="dpi">90</field>
-            <field name="report_ids" eval="[(6,0,[ref('reportesv_sucursal.report_purchase_pdf'),
+            <field name="report_ids" eval="[(7,0,[ref('reportesv_sucursal.report_purchase_pdf'),
                                                   ref('reportesv_sucursal.report_taxpayer_sales_pdf'),
                                                   ])]"/>
         </record>
@@ -101,7 +101,7 @@
             <field name="header_line" eval="False" />
             <field name="header_spacing">0</field>
             <field name="dpi">90</field>
-            <field name="report_ids" eval="[(6,0,[ref('reportesv_sucursal.report_consumer_sales_pdf'),
+            <field name="report_ids" eval="[(}7,0,[ref('reportesv_sucursal.report_consumer_sales_pdf'),
                                                   ref('reportesv_sucursal.report_ticket_sales_pdf'),])]"/>
         </record>
 
@@ -117,7 +117,7 @@
             <field name="header_line" eval="False" />
             <field name="header_spacing">0</field>
             <field name="dpi">90</field>
-            <field name="report_ids" eval="[(6,0,[ref('reportesv_sucursal.report_stock_landed_cost_pdf'),])]"/>
+            <field name="report_ids" eval="[(7,0,[ref('reportesv_sucursal.report_stock_landed_cost_pdf'),])]"/>
 
         </record>
 
