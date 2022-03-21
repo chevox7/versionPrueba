@@ -34,7 +34,7 @@ class odoosv_taxpayer_report_pdf1(models.AbstractModel):
             and  data.get('form').get('date_year')\
             and  data.get('form').get('date_month'):
             docids = self.env['res.company'].browse(data['form']['company_id'][0])
-        return {'doc_ids': self.env['wizard.sv.taxpayer.report'].browse(data['ids']),
+        return {'doc_ids': self.env['wizard.sv.taxpayer.report1'].browse(data['ids']),
                 'doc_model': report.model,
                 'docs': self.env['res.company'].browse(data['form']['company_id'][0]),
                 'data': data,
@@ -53,7 +53,7 @@ class odoosv_consumer_report_pdf1(models.AbstractModel):
             and  data.get('form').get('date_year')\
             and  data.get('form').get('date_month'):
             docids = self.env['res.company'].browse(data['form']['company_id'][0])
-        return {'doc_ids': self.env['wizard.sv.consumer.report'].browse(data['ids']),
+        return {'doc_ids': self.env['wizard.sv.consumer.report1'].browse(data['ids']),
                 'doc_model': report.model,
                 'docs': self.env['res.company'].browse(data['form']['company_id'][0]),
                 'data': data,
