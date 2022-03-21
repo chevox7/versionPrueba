@@ -27,7 +27,7 @@
         'views/consumer_report_pdf_view.xml',
         #'views/ticket_report_pdf_view.xml',
         'wizard/wizard_purchases_report.xml',
-        'wizard/wizard_taxpayer_sales_report.xml',
+        'wizard/wizard_taxpayer_sales_report1.xml',
         'wizard/wizard_consumer_report.xml',
         #'wizard/wizard_ticket_report.xml',
     ],
