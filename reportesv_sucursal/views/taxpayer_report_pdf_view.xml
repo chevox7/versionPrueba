@@ -109,7 +109,7 @@
                   <h2 class="center-middle-title" style="line-height: 15pt;font-size: 30px;text-transform:uppercase"><span t-field="o.name"/></h2>
                   <h2 class="center-middle-title">LIBRO DE VENTAS A CONTRIBUYENTES</h2>
                   <h2 class="center-middle-title">SUCURSAL: <span t-esc="o.get_stock_name(stock_id)"/></h2>
-                  <h2 class="center-middle-title">NIT: <span t-esc="o.partner_id.nit"/> NRC: <span t-esc="o.partner_id.nrc"/></h2>
+                 <!--  <h2 class="center-middle-title">NIT: <span t-esc="o.partner_id.nit"/> NRC: <span t-esc="o.partner_id.nrc"/></h2>  -->
                   <h2 class="center-middle-title"><span t-esc="o.get_month_str(month)"/> <span t-esc="year"/></h2>
                 </div>
                 <hr style="width:100%;color:#FFFFFF;border-width:3px;line-height:3pt;"/>
