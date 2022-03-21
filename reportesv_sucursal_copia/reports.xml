@@ -7,8 +7,8 @@
             string="Libro de compras"
             model="res.company"
             report_type="qweb-pdf"
-            file="reportesv_sucursal.odoosv_purchase_report_pdf"
-            name="reportesv_sucursal.odoosv_purchase_report_pdf"
+            file="reportesv_sucursal_copia.odoosv_purchase_report_pdf"
+            name="reportesv_sucursal_copia.odoosv_purchase_report_pdf"
             menu="False"
         />
 
@@ -17,8 +17,8 @@
             string="Libro de ventas contribuyentes"
             model="res.company"
             report_type="qweb-pdf"
-            file="reportesv_sucursal.odoosv_taxpayer_report_pdf"
-            name="reportesv_sucursal.odoosv_taxpayer_report_pdf"
+            file="reportesv_sucursal_copia.odoosv_taxpayer_report_pdf"
+            name="reportesv_sucursal_copia.odoosv_taxpayer_report_pdf"
             menu="False"
         />
 
@@ -27,8 +27,8 @@
             string="Libro de ventas consumidores"
             model="res.company"
             report_type="qweb-pdf"
-            file="reportesv_sucursal.odoosv_consumer_report_pdf"
-            name="reportesv_sucursal.odoosv_consumer_report_pdf"
+            file="reportesv_sucursal_copia.odoosv_consumer_report_pdf"
+            name="reportesv_sucursal_copia.odoosv_consumer_report_pdf"
             menu="False"
         />
 
@@ -37,8 +37,8 @@
             string="Libro de ventas con tickets"
             model="res.company"
             report_type="qweb-pdf"
-            file="reportesv_sucursal.odoosv_ticket_report_pdf"
-            name="reportesv_sucursal.odoosv_ticket_report_pdf"
+            file="reportesv_sucursal_copia.odoosv_ticket_report_pdf"
+            name="reportesv_sucursal_copia.odoosv_ticket_report_pdf"
             menu="False"
         />
 
@@ -47,8 +47,8 @@
             string="Retaceo"
             model="stock.landed.cost"
             report_type="qweb-pdf"
-            file="reportesv_sucursal.odoosv_landed_cost_report_pdf"
-            name="reportesv_sucursal.odoosv_landed_cost_report_pdf"
+            file="reportesv_sucursal_copia.odoosv_landed_cost_report_pdf"
+            name="reportesv_sucursal_copia.odoosv_landed_cost_report_pdf"
             menu="False"
         />
 
@@ -84,8 +84,8 @@
             <field name="header_line" eval="False" />
             <field name="header_spacing">0</field>
             <field name="dpi">90</field>
-            <field name="report_ids" eval="[(7,0,[ref('reportesv_sucursal.report_purchase_pdf'),
-                                                  ref('reportesv_sucursal.report_taxpayer_sales_pdf'),
+            <field name="report_ids" eval="[(7,0,[ref('reportesv_sucursal_copia.report_purchase_pdf'),
+                                                  ref('reportesv_sucursal_copia.report_taxpayer_sales_pdf'),
                                                   ])]"/>
         </record>
 
@@ -101,7 +101,7 @@
             <field name="header_line" eval="False" />
             <field name="header_spacing">0</field>
             <field name="dpi">90</field>
-            <field name="report_ids" eval="[(}7,0,[ref('reportesv_sucursal.report_consumer_sales_pdf'),
+            <field name="report_ids" eval="[(}7,0,[ref('reportesv_sucursal_copia.report_consumer_sales_pdf'),
                                                   ref('reportesv_sucursal.report_ticket_sales_pdf'),])]"/>
         </record>
 
@@ -117,7 +117,7 @@
             <field name="header_line" eval="False" />
             <field name="header_spacing">0</field>
             <field name="dpi">90</field>
-            <field name="report_ids" eval="[(7,0,[ref('reportesv_sucursal.report_stock_landed_cost_pdf'),])]"/>
+            <field name="report_ids" eval="[(7,0,[ref('reportesv_sucursal_copia.report_stock_landed_cost_pdf'),])]"/>
 
         </record>
 
