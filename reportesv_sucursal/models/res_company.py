@@ -359,7 +359,7 @@ order by s.fecha, s.factura
 
     def get_taxpayer_details1(self, company_id, date_year, date_month, stock_id):
             data = {}
-            sql = """CREATE OR REPLACE VIEW odoosv_reportesv_taxpayer_report AS (
+            sql = """CREATE OR REPLACE VIEW odoosv_reportesv_taxpayer_report1 AS (
                 select * from(
         select COALESCE(ai.date,ai.invoice_date) as fecha
         ,1 as sucursal
