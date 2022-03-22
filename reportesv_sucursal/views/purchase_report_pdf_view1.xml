@@ -1,6 +1,6 @@
 <odoo>
   <data>
-    <template id ='odoosv_purchase_report_pdf'>
+    <template id ='odoosv_purchase_report_pdf1'>
       <t t-call="web.html_container">
         <t t-call="web.basic_layout">
           <div class="page" style="font-size: 8pt">
@@ -135,7 +135,7 @@
 
                 <div style="text-align: center">
                   <h2 class="center-middle-title" style="font-size:20pt;">NOMBRE DEL CONTRIBUYENTE: <span t-field="o.name"/></h2>
-                  <h2 class="center-middle-title">LIBRO DE COMPRAS CON OPERACIONES DE RETENCIÓN</h2>
+                  <h2 class="center-middle-title">LIBRO DE anexos de  COMPRAS CON OPERACIONES DE RETENCIÓN</h2>
                   <h2 class="center-middle-title">NIT: <span t-field="o.partner_id.nit"/> NRC: <span t-field="o.partner_id.nrc"/></h2>
                   <h2 class="center-middle-title">MES: <span t-esc="o.get_month_str(month)"/> DE <span t-esc="year"/></h2>
                   <h2 class="center-middle-title">VALORES EXPRESADOS EN DOLARES DE LOS ESTADOS UNIDOS</h2>
@@ -173,7 +173,7 @@
                 <th class="standar">Compras a Sujetos Excluidos</th>
                 <th class="standar">Retención a Terceros</th>
               </tr>
-              <tr id="datos" t-foreach="company.get_purchase_details(company_id, year, month)" t-as="c">
+              <tr id="datos" t-foreach="company.get_purchase_details1(company_id, year, month)" t-as="c">
                 <td class="iden"><span t-esc="int(c_index + 1)"/></td>
                 <td class="standar" style="padding:8px;"></td>   <!-- <span t-esc="c.get('fecha').strftime('%d-%m-%Y')"/> -->
                 <td class="num-fact-p"><span t-esc="c.get('factura')"/></td>

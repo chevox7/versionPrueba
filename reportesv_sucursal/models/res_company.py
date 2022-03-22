@@ -236,6 +236,230 @@ order by s.Fecha, s.Factura,S.nrc,s.nit
             data = self._cr.dictfetchall()
         return data
 
+
+    def get_purchase_details1(self, company_id, date_year, date_month):
+        data = {}
+
+        sql = """CREATE OR REPLACE VIEW odoosv_reportesv_purchase_report1 AS (
+            select * from (
+select ai.id as id,ai.invoice_date as fecha
+	,ai.doc_numero as factura
+	,rp.name as proveedor
+	,rp.nrc as NRC
+	,rp.nit as NIT
+	,False as Importacion
+	,/*Calculando el gravado (todo lo que tiene un impuesto aplicado de iva)*/
+     (select coalesce(sum(ail.price_subtotal),0.00) 
+      from account_move_line ail
+      where ail.move_id=ai.id
+      	  and ail.exclude_from_invoice_tab=False 
+	      and exists(select ailt.account_tax_id 
+					from account_move_line_account_tax_rel ailt
+				        inner join account_tax atx on ailt.account_tax_id=atx.id
+				        inner join account_tax_group atg on atx.tax_group_id=atg.id
+			         where ailt.account_move_line_id=ail.id and lower(atg.code) = 'iva')
+      ) as Gravado,
+      /*Calculando el excento que no tiene iva*/
+      (select coalesce(sum(ail.price_subtotal),0.00) 
+      from account_move_line ail
+      where ail.move_id=ai.id
+      	  and ail.exclude_from_invoice_tab=False 
+	      and exists(select ailt.account_tax_id 
+					from account_move_line_account_tax_rel ailt
+				        inner join account_tax atx on ailt.account_tax_id=atx.id
+				        inner join account_tax_group atg on atx.tax_group_id=atg.id
+			         where ailt.account_move_line_id=ail.id and lower(atg.code) = 'exento')
+      ) as Exento,
+      /*Calculando el iva*/
+      (Select coalesce(sum(ait.debit-ait.credit),0.00)
+       from account_move_line ait 
+ 	       inner join account_tax atx on ait.tax_line_id=atx.id
+	       inner join account_tax_group atg on atx.tax_group_id=atg.id
+       where ait.move_id=ai.id
+	       and lower(atg.code) = 'iva'
+       ) as Iva
+	   ,/*Calculando el retenido*/
+      (Select coalesce(sum(ait.credit-ait.debit),0.00)
+       from account_move_line ait 
+ 	       inner join account_tax atx on ait.tax_line_id=atx.id
+	       inner join account_tax_group atg on atx.tax_group_id=atg.id
+       where ait.move_id=ai.id
+	       and lower(atg.code) = 'retencion'
+       ) as Retenido
+	    ,/*Calculando el percibido*/
+      (Select coalesce(sum(ait.debit-ait.credit),0.00)
+       from account_move_line ait 
+ 	       inner join account_tax atx on ait.tax_line_id=atx.id
+	       inner join account_tax_group atg on atx.tax_group_id=atg.id
+       where ait.move_id=ai.id
+	       and lower(atg.code) = 'percepcion'
+       ) as Percibido
+         ,/*Calculando el excluido*/
+      (Select coalesce(sum(ait.debit-ait.credit),0.00)
+       from account_move_line ait 
+ 	       inner join account_tax atx on ait.tax_line_id=atx.id
+	       inner join account_tax_group atg on atx.tax_group_id=atg.id
+       where ait.move_id=ai.id
+	       and lower(atg.code) = 'nosujeto'
+       ) as nosujeto
+	   ,/*Calculando el retencion a terceros*/
+      (Select coalesce(sum(ait.credit-ait.debit),0.00)
+       from account_move_line ait 
+ 	       inner join account_tax atx on ait.tax_line_id=atx.id
+	       inner join account_tax_group atg on atx.tax_group_id=atg.id
+       where ait.move_id=ai.id
+	       and lower(atg.code) = 'excluido'
+       ) as excluido
+        ,/*Calculando el retencion a terceros*/
+      (Select coalesce(sum(ait.debit-ait.credit),0.00)
+       from account_move_line ait 
+ 	       inner join account_tax atx on ait.tax_line_id=atx.id
+	       inner join account_tax_group atg on atx.tax_group_id=atg.id
+       where ait.move_id=ai.id
+	       and lower(atg.code) = 'otros'
+       ) as otros
+from account_move ai
+	inner join res_partner rp on ai.partner_id=rp.id
+	inner join odoosv_fiscal_document doc on ai.tipo_documento_id =doc.id
+where ai.company_id= {0} 
+	and date_part('year',COALESCE(ai.date,ai.invoice_date))=  {1} 
+	and date_part('month',COALESCE(ai.date,ai.invoice_date))=  {2}
+	and ai.move_type='in_invoice' 
+	and ai.state in ('posted')  
+	and doc.contribuyente = true
+	and ((doc.requiere_poliza is null) or (doc.requiere_poliza = false))
+	and ((ai.nofiscal is not null and ai.nofiscal = False)or (ai.nofiscal is null))
+	
+	union all
+	
+	select ai.id as id,ai.invoice_date as fecha
+	,ai.doc_numero as factura
+	,rp.name as proveedor
+	,rp.nrc as NRC
+	,rp.nit as NIT
+	,False as Importacion
+	,/*Calculando el gravado (todo lo que tiene un impuesto aplicado de iva)*/
+      (select coalesce(sum(ail.price_subtotal),0.00) 
+      from account_move_line ail
+      where ail.move_id=ai.id
+      	  and ail.exclude_from_invoice_tab=False 
+	      and exists(select ailt.account_tax_id 
+					from account_move_line_account_tax_rel ailt
+				        inner join account_tax atx on ailt.account_tax_id=atx.id
+				        inner join account_tax_group atg on atx.tax_group_id=atg.id
+			         where ailt.account_move_line_id=ail.id and lower(atg.code) = 'iva')
+      ) as Gravado,
+      /*Calculando el excento que no tiene iva*/
+      (select coalesce(sum(ail.price_subtotal),0.00) 
+      from account_move_line ail
+      where ail.move_id=ai.id
+      	  and ail.exclude_from_invoice_tab=False 
+	      and exists(select ailt.account_tax_id 
+					from account_move_line_account_tax_rel ailt
+				        inner join account_tax atx on ailt.account_tax_id=atx.id
+				        inner join account_tax_group atg on atx.tax_group_id=atg.id
+			         where ailt.account_move_line_id=ail.id and lower(atg.code) = 'exento')
+      ) as Exento,
+      /*Calculando el iva*/
+      (Select coalesce(sum(ait.debit-ait.credit),0.00)
+       from account_move_line ait 
+ 	       inner join account_tax atx on ait.tax_line_id=atx.id
+	       inner join account_tax_group atg on atx.tax_group_id=atg.id
+       where ait.move_id=ai.id
+	       and lower(atg.code) = 'iva'
+       ) as Iva
+	   ,/*Calculando el retenido*/
+      (Select coalesce(sum(ait.credit-ait.debit),0.00)
+       from account_move_line ait 
+ 	       inner join account_tax atx on ait.tax_line_id=atx.id
+	       inner join account_tax_group atg on atx.tax_group_id=atg.id
+       where ait.move_id=ai.id
+	       and lower(atg.code) = 'retencion'
+       ) as Retenido
+	    ,/*Calculando el percibido*/
+      (Select coalesce(sum(ait.debit-ait.credit),0.00)
+       from account_move_line ait 
+ 	       inner join account_tax atx on ait.tax_line_id=atx.id
+	       inner join account_tax_group atg on atx.tax_group_id=atg.id
+       where ait.move_id=ai.id
+	       and lower(atg.code) = 'percepcion'
+       ) as Percibido
+         ,/*Calculando el excluido*/
+      (Select coalesce(sum(ait.debit-ait.credit),0.00)
+       from account_move_line ait 
+ 	       inner join account_tax atx on ait.tax_line_id=atx.id
+	       inner join account_tax_group atg on atx.tax_group_id=atg.id
+       where ait.move_id=ai.id
+	       and lower(atg.code) = 'nosujeto'
+       ) as nosujeto
+	   ,/*Calculando el retencion a terceros*/
+      (Select coalesce(sum(ait.credit-ait.debit),0.00)
+       from account_move_line ait 
+ 	       inner join account_tax atx on ait.tax_line_id=atx.id
+	       inner join account_tax_group atg on atx.tax_group_id=atg.id
+       where ait.move_id=ai.id
+	       and lower(atg.code) = 'excluido'
+       ) as excluido
+         ,/*Calculando el retencion a terceros*/
+      (Select coalesce(sum(ait.debit-ait.credit),0.00)
+       from account_move_line ait 
+ 	       inner join account_tax atx on ait.tax_line_id=atx.id
+	       inner join account_tax_group atg on atx.tax_group_id=atg.id
+       where ait.move_id=ai.id
+	       and lower(atg.code) = 'otros'
+       ) as otros
+from account_move ai
+	inner join res_partner rp on ai.partner_id=rp.id
+	inner join odoosv_fiscal_document doc on ai.tipo_documento_id =doc.id
+where ai.company_id= {0} 
+	and date_part('year',COALESCE(ai.date,ai.invoice_date))=  {1} 
+	and date_part('month',COALESCE(ai.date,ai.invoice_date))=  {2}
+	and ai.move_type='in_refund' 
+	and doc.contribuyente = true 
+	and ((doc.requiere_poliza is null) or (doc.requiere_poliza = false))
+	and ai.state in ('posted') 
+	and ((ai.nofiscal is not null and ai.nofiscal = False)or (ai.nofiscal is null))
+	
+
+
+union all
+
+select  ai.id as id,ai.invoice_date as fecha
+	,ai.doc_numero as factura
+	,rp.name as proveedor
+	,rp.nrc as NRC
+	,rp.nit as NIT
+	,True as Importacion
+               ,(ai.amount_total*100/13) as  Gravado
+               ,0.0  Exento
+               ,ai.amount_total as  Iva
+               ,0.0 as  Retenido
+               ,0.0 as  Percibido
+               ,0.0 as  nosujeto
+               ,0.0 as  excluido
+                 ,0.0 as  otros
+from account_move ai
+	inner join res_partner rp on ai.partner_id=rp.id
+	inner join odoosv_fiscal_document doc on ai.tipo_documento_id =doc.id
+where ai.company_id= {0} 
+	and date_part('year',COALESCE(ai.date,ai.invoice_date))=  {1} 
+	and date_part('month',COALESCE(ai.date,ai.invoice_date))=  {2}
+	and ai.move_type='in_invoice' 
+	and doc.contribuyente = true 
+	and doc.requiere_poliza = true
+	and ai.state in ('posted') 
+	and ((ai.nofiscal is not null and ai.nofiscal = False)or (ai.nofiscal is null))
+
+) S
+order by s.Fecha, s.Factura,S.nrc,s.nit
+        )""".format(company_id,date_year,date_month)
+        tools.drop_view_if_exists(self._cr, 'odoosv_reportesv_purchase_report1')
+        self._cr.execute(sql)
+        self._cr.execute("SELECT * FROM public.odoosv_reportesv_purchase_report1")
+        if self._cr.description: #Verify whether or not the query generated any tuple before fetching in order to avoid PogrammingError: No results when fetching
+            data = self._cr.dictfetchall()
+        return data
+
     def get_taxpayer_details(self, company_id, date_year, date_month, stock_id):
         data = {}
         sql = """CREATE OR REPLACE VIEW odoosv_reportesv_taxpayer_report AS (

@@ -3,12 +3,12 @@
     <data>
 
         <report
-            id="report_purchase_pdf"
+            id="report_purchase_pdf1"
             string="Libro de compras"
             model="res.company"
             report_type="qweb-pdf"
-            file="reportesv_sucursal.odoosv_purchase_report_pdf"
-            name="reportesv_sucursal.odoosv_purchase_report_pdf"
+            file="reportesv_sucursal.odoosv_purchase_report_pdf1"
+            name="reportesv_sucursal.odoosv_purchase_report_pdf1"
             menu="False"
         />
 
@@ -84,7 +84,7 @@
             <field name="header_line" eval="False" />
             <field name="header_spacing">0</field>
             <field name="dpi">90</field>
-            <field name="report_ids" eval="[(6,0,[ref('reportesv_sucursal.report_purchase_pdf'),
+            <field name="report_ids" eval="[(6,0,[ref('reportesv_sucursal.report_purchase_pdf1'),
                                                   ref('reportesv_sucursal.report_taxpayer_sales_pdf1'),
                                                   ])]"/>
         </record>
